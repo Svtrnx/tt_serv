@@ -123,7 +123,8 @@ async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokReg
 		proxy_username=form_data.proxy_username,
 		proxy_password=form_data.proxy_password,
 		work_time=new_time,
-		reg_time=datetime.now()
+		reg_time=datetime.now(),
+		user_reg=form_data.user_reg
 	)
 	user_reg = create_user_reg(db=db, user_reg=new_user_reg)
 	return {'user_reg': user_reg}

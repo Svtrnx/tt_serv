@@ -147,6 +147,7 @@ def create_user_reg(db: Session, user_reg: schema.TikTokSchemaRegAccount):
         proxy_password              = user_reg.proxy_password,
         work_time                   = user_reg.work_time,
         reg_time                    = user_reg.reg_time,
+        user_reg                    = user_reg.user_reg,
     )
     db.add(new_user_reg)
     db.commit()

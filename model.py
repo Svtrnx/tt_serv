@@ -75,6 +75,7 @@ class TikTokTableRegAccounts(Base):
     proxy_password = Column(String)
     work_time = Column(DateTime)
     reg_time = Column(DateTime)
+    user_reg = Column(String)
 
 
 class OAuth2PasswordRequestFormSignin:
@@ -135,7 +136,8 @@ class TikTokRegUserRequestForm:
         proxy_address: str = Form(),
         proxy_port: int = Form(),
         proxy_username: str = Form(),
-        proxy_password: str = Form()
+        proxy_password: str = Form(),
+        user_reg: str = Form()
     ):
         self.username = username
         self.email = email
@@ -145,7 +147,8 @@ class TikTokRegUserRequestForm:
         self.proxy_address = proxy_address
         self.proxy_port = proxy_port
         self.proxy_username = proxy_username
-        self.proxy_password = proxy_password
+        self.proxy_password = proxy_password,
+        self.user_reg = user_reg
         
 class TikTokClusterHwidCheckRequestForm:
 	

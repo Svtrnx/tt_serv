@@ -30,6 +30,7 @@ class TikTokSchemaRegAccount(BaseModel):
     proxy_password: Optional[str]=None
     work_time: Optional[datetime]=None
     reg_time: Optional[datetime]=None
+    user_reg: Optional[str]=None
 
     class Config:
         orm_mode = True
