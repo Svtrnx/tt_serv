@@ -178,4 +178,34 @@ async def check_auth(db: Session = Depends(get_db)):
         return {"message": "Proxy not found, all proxies are used!"}
 	
  
+@userRouter.get("/get_reg_accounts")
+async def check_auth(db: Session = Depends(get_db), 
+                     current_user: model.TikTokTableUser = Depends(get_current_user)):
+    
+    reg_accounts = db.query(model.TikTokTableRegAccounts).all()
+    
+    if reg_accounts:
+       
+        reg_accounts_data = [
+            {
+                "username": account.username,
+                "email": account.email,
+                "password": account.password,
+                "is_loginning_now": account.is_loginning_now,
+                "is_uploaded_content": account.is_uploaded_content,
+                "proxy_address": account.proxy_address,
+                "proxy_port": account.proxy_port,
+                "proxy_username": account.proxy_username,
+                "proxy_password": account.proxy_password,
+                "work_time": account.work_time,
+                "reg_time": account.reg_time,
+                "user_reg": account.user_reg
+            }
+            for account in reg_accounts
+        ]
+        return reg_accounts_data
+    else:
+        return {"message": "No available reg accounts!"}
+	
+ 
  
