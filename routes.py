@@ -97,7 +97,7 @@ async def create_task(db: Session = Depends(get_db), current_user: model.MediaRe
 			completed=form_data.completed,
 			content_type=form_data.content_type,
 			sound=form_data.sound,
-			time_content=datetime.now(),
+			time_content=datetime.now() + timedelta(hours=2),
 			username=form_data.username,
 			unique_id=form_data.unique_id,
 			media_name=form_data.media_name,
@@ -109,7 +109,7 @@ async def create_task(db: Session = Depends(get_db), current_user: model.MediaRe
 
 @userRouter.post('/create_reg_account')
 async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokRegUserRequestForm = Depends()):
-	current_time = datetime.now()
+	current_time = datetime.now() + timedelta(hours=2)
 	new_time = current_time + timedelta(hours=12)
 	print(new_time)
 	new_user_reg = model.TikTokTableRegAccounts(
@@ -123,7 +123,7 @@ async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokReg
 		proxy_username=form_data.proxy_username,
 		proxy_password=form_data.proxy_password,
 		work_time=new_time,
-		reg_time=datetime.now(),
+		reg_time=datetime.now() + timedelta(hours=2),
 		user_reg=form_data.user_reg
 	)
 	user_reg = create_user_reg(db=db, user_reg=new_user_reg)
