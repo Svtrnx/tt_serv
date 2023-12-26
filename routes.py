@@ -248,10 +248,10 @@ async def check_auth(db: Session = Depends(get_db), current_user: model.TikTokCl
 
 @userRouter.patch('/update_account_activity_login')
 def update_is_loginning_now(
-    username: str = Body(embed=True), 
-    email: str = Body(embed=True), 
-    password: str = Body(embed=True), 
-    is_loginning_now: bool = Body(embed=True), 
+	username: str = Body(embed=True), 
+	email: str = Body(embed=True), 
+	password: str = Body(embed=True), 
+	is_loginning_now: bool = Body(embed=True), 
 	db: Session = Depends(get_db), 
 	current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), 
  	form_data: model.TikTokAccountIsActiveUpdateForm = Depends()
@@ -280,10 +280,10 @@ def update_is_loginning_now(
 
 @userRouter.patch('/update_account_upload_content')
 def update_is_uploaded_content(
-    username: str = Body(embed=True), 
-    email: str = Body(embed=True), 
-    password: str = Body(embed=True), 
-    is_uploaded_content: bool = Body(embed=True), 
+	username: str = Body(embed=True), 
+	email: str = Body(embed=True), 
+	password: str = Body(embed=True), 
+	is_uploaded_content: bool = Body(embed=True), 
 	db: Session = Depends(get_db), 
 	current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), 
  	form_data: model.TikTokAccountIsActiveUpdateForm = Depends()
@@ -312,9 +312,9 @@ def update_is_uploaded_content(
 
 @userRouter.patch('/update_tt_media')
 def update_tt_media_to_completed(
-    media_name: str = Body(embed=True), 
-    unique_id: str = Body(embed=True),
-    completed: bool = Body(embed=True), 
+	media_name: str = Body(embed=True), 
+	unique_id: str = Body(embed=True),
+	completed: bool = Body(embed=True), 
 	db: Session = Depends(get_db), 
 	current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), 
  	form_data: model.TikTokMediaCompletedUpdateForm = Depends()
