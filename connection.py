@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
 from model import Base, TikTokTable, TikTokTableUser, TikTokTableMedia, TikTokTableRegAccounts
 from config import DB_NAME, DB_HOST, DB_PORT, DB_USER, DB_PASS
@@ -23,13 +23,13 @@ def query_tiktok_table(current_user):
 
     return results
 
-def query_tiktok_media(username):
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def query_tiktok_media(session, username):
 
-    results = session.query(TikTokTableMedia).filter((TikTokTableMedia.username == username) &
-                                                    TikTokTableMedia.completed == False).all()
+    results = session.query(TikTokTableMedia).filter(
+        and_(TikTokTableMedia.username == username, TikTokTableMedia.completed == False)
+    ).all()
 
+    
     session.close()
 
     return results
