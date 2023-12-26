@@ -5,7 +5,10 @@ from cookie import OAuth2PasswordBearerWithCookie
 from sqlalchemy.orm import Session
 from fastapi import Depends, APIRouter, Request, Response, status, HTTPException
 from connection import get_user_only_by_username, get_db
+from dotenv import load_dotenv
+from config import ALGORITHM, SECRET_KEY, COOKIE_NAME
 
+load_dotenv()
 
 
 
@@ -18,13 +21,13 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7", algorithm="HS256")
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    payload = jwt.decode(token, "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7", algorithms=["HS256"])
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     user = get_user_only_by_username(db=db, username=payload.get("sub"))
     if not user:
         raise HTTPException(

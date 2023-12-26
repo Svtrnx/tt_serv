@@ -1,5 +1,5 @@
-from fastapi import Depends, APIRouter, Request, Body, Response, HTTPException, status, Form
-from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg
+from fastapi import Depends, APIRouter, Request, Body, Response, HTTPException, status, Form, Cookie
+from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, check_key
 from schema import Token
 from sqlalchemy.orm import Session
 import model
@@ -138,8 +138,8 @@ async def create_task(
 		proxy_username: str = Body(embed=True),
 		proxy_password: str = Body(embed=True),
 		used: bool = Body(embed=True),
-        db: Session = Depends(get_db),
-        form_data: model.TikTokProxyUpdateForm = Depends()
+		db: Session = Depends(get_db),
+		form_data: model.TikTokProxyUpdateForm = Depends()
 ):
 	form_data.proxy_address 	= proxy_address
 	form_data.proxy_port 		= proxy_port
@@ -164,48 +164,204 @@ async def create_task(
 
 
 @userRouter.get("/get_proxy")
-async def check_auth(db: Session = Depends(get_db)):
-    proxy = db.query(model.TikTokTableProxy).filter(model.TikTokTableProxy.used == False).first()
-    
-    if proxy:
-        return {
-            "proxy_address": proxy.proxy_address,
-            "proxy_port": proxy.proxy_port,
-            "proxy_username": proxy.proxy_username,
-            "proxy_password": proxy.proxy_password
-        }
-    else:
-        return {"message": "Proxy not found, all proxies are used!"}
+async def check_auth(proxy_type: str, db: Session = Depends(get_db)):
+	proxy = db.query(model.TikTokTableProxy).filter((model.TikTokTableProxy.used == False) &
+												(model.TikTokTableProxy.proxy_type == proxy_type)).first()
+	
+	if proxy:
+		return {
+			"proxy_address": 	proxy.proxy_address,
+			"proxy_port": 		proxy.proxy_port,
+			"proxy_username": 	proxy.proxy_username,
+			"proxy_password": 	proxy.proxy_password,
+			"proxy_type": 		proxy.proxy_type
+		}
+	else:
+		return {"message": "Proxy not found!"}
 	
  
 @userRouter.get("/get_reg_accounts")
 async def check_auth(db: Session = Depends(get_db), 
-                     current_user: model.TikTokTableUser = Depends(get_current_user)):
-    
-    reg_accounts = db.query(model.TikTokTableRegAccounts).all()
-    
-    if reg_accounts:
-       
-        reg_accounts_data = [
-            {
-                "username": account.username,
-                "email": account.email,
-                "password": account.password,
-                "is_loginning_now": account.is_loginning_now,
-                "is_uploaded_content": account.is_uploaded_content,
-                "proxy_address": account.proxy_address,
-                "proxy_port": account.proxy_port,
-                "proxy_username": account.proxy_username,
-                "proxy_password": account.proxy_password,
-                "work_time": account.work_time,
-                "reg_time": account.reg_time,
-                "user_reg": account.user_reg
-            }
-            for account in reg_accounts
-        ]
-        return reg_accounts_data
-    else:
-        return {"message": "No available reg accounts!"}
+					 current_user: model.TikTokTableUser = Depends(get_current_user)):
 	
- 
+	reg_accounts = db.query(model.TikTokTableRegAccounts).all()
+	
+	if reg_accounts:
+	   
+		reg_accounts_data = [
+			{
+				"username": account.username,
+				"email": account.email,
+				"password": account.password,
+				"is_loginning_now": account.is_loginning_now,
+				"is_uploaded_content": account.is_uploaded_content,
+				"proxy_address": account.proxy_address,
+				"proxy_port": account.proxy_port,
+				"proxy_username": account.proxy_username,
+				"proxy_password": account.proxy_password,
+				"work_time": account.work_time,
+				"reg_time": account.reg_time,
+				"user_reg": account.user_reg
+			}
+			for account in reg_accounts
+		]
+		return reg_accounts_data
+	else:
+		return {"message": "No available reg accounts!"}
+	
+@userRouter.post("/get_reg_accounts_bot")
+async def check_auth(db: Session = Depends(get_db), current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), username: str = Body(embed=True)):
+	user_hwid = query_tiktok_table_check_auth(current_user.hwid)
+	user_key_taken = check_key(session=session, username=username, hwid=current_user.hwid)
+	print(user_key_taken)
+	if user_key_taken == False:
+		raise HTTPException(status_code=311, detail="Autentication failed")
+	else:
+		user_info = check_user(session=session, username=username, user_key=user_key_taken)
+		if user_hwid is None or user_info == False:
+			raise HTTPException(status_code=311, detail="Autentication failed")
+		else:
+			reg_accounts = db.query(model.TikTokTableRegAccounts).all()
+			
+			if reg_accounts:
+			
+				reg_accounts_data = [
+					{
+						"username": account.username,
+						"email": account.email,
+						"password": account.password,
+						"is_loginning_now": account.is_loginning_now,
+						"is_uploaded_content": account.is_uploaded_content,
+						"proxy_address": account.proxy_address,
+						"proxy_port": account.proxy_port,
+						"proxy_username": account.proxy_username,
+						"proxy_password": account.proxy_password,
+						"work_time": account.work_time,
+						"reg_time": account.reg_time,
+						"user_reg": account.user_reg
+					}
+					for account in reg_accounts
+				]
+				return reg_accounts_data
+			else:
+				return {"message": "No available reg accounts!"}
+
+@userRouter.patch('/update_account_activity_login')
+def update_is_loginning_now(
+    username: str = Body(embed=True), 
+    email: str = Body(embed=True), 
+    password: str = Body(embed=True), 
+    is_loginning_now: bool = Body(embed=True), 
+	db: Session = Depends(get_db), 
+	current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), 
+ 	form_data: model.TikTokAccountIsActiveUpdateForm = Depends()
+  	):
+	user_hwid = query_tiktok_table_check_auth(current_user.hwid)
+	if user_hwid is None:
+		raise HTTPException(status_code=311, detail="Autentication failed")
+	else:
+		form_data.username = username
+		form_data.email = email
+		form_data.password = password
+		form_data.is_loginning_now = is_loginning_now
+		db_account = db.query(model.TikTokTableRegAccounts).filter_by(
+		username=form_data.username,
+		email=form_data.email,
+		password=form_data.password
+  		).first()
+		if db_account:
+			db_account.is_loginning_now = form_data.is_loginning_now
+			db.commit()
+			db.refresh(db_account)
+			return {"db_account": db_account}
+		else:
+			return {"error": "Account dont found"}
+
+
+@userRouter.patch('/update_account_upload_content')
+def update_is_uploaded_content(
+    username: str = Body(embed=True), 
+    email: str = Body(embed=True), 
+    password: str = Body(embed=True), 
+    is_uploaded_content: bool = Body(embed=True), 
+	db: Session = Depends(get_db), 
+	current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), 
+ 	form_data: model.TikTokAccountIsActiveUpdateForm = Depends()
+  	):
+	user_hwid = query_tiktok_table_check_auth(current_user.hwid)
+	if user_hwid is None:
+		raise HTTPException(status_code=311, detail="Autentication failed")
+	else:
+		form_data.username = username
+		form_data.email = email
+		form_data.password = password
+		form_data.is_uploaded_content = is_uploaded_content
+		db_account = db.query(model.TikTokTableRegAccounts).filter_by(
+		username=form_data.username,
+		email=form_data.email,
+		password=form_data.password
+  ).first()
+		if db_account:
+			db_account.is_uploaded_content = form_data.is_uploaded_content
+			db.commit()
+			db.refresh(db_account)
+			return {"db_account": db_account}
+		else:
+			return {"error": "Account dont found"}
+
+
+@userRouter.patch('/update_tt_media')
+def update_tt_media_to_completed(
+    media_name: str = Body(embed=True), 
+    unique_id: str = Body(embed=True),
+    completed: bool = Body(embed=True), 
+	db: Session = Depends(get_db), 
+	current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), 
+ 	form_data: model.TikTokMediaCompletedUpdateForm = Depends()
+  	):
+	user_hwid = query_tiktok_table_check_auth(current_user.hwid)
+	if user_hwid is None:
+		raise HTTPException(status_code=311, detail="Autentication failed")
+	else:
+		form_data.media_name = media_name
+		form_data.unique_id = unique_id
+		form_data.completed = completed
+		db_tt_media = db.query(model.TikTokTableMedia).filter_by(
+		cluster_name_media=form_data.media_name,
+		unique_id=form_data.unique_id).first()
+		if db_tt_media:
+			updated_rows = db.query(model.TikTokTableMedia).filter_by(
+				cluster_name_media=form_data.media_name,
+				unique_id=form_data.unique_id
+			).update({"completed": form_data.completed})
+			if updated_rows > 0:
+				db.commit()
+				return {"message": f"{updated_rows} rows updated successfully"}
+			else:
+				return {"message": "No matching rows found for update"}
+		else:
+			return {"error": "Media dont found"}
+	
+
+# def check_user_bot_info(username: str = Body(embed=True, default=None), user_key: str = Body(embed=True, default=None), hwid: str = Body(embed=True, default=None)):
+#     user_hwid = query_tiktok_table_check_auth(hwid)
+#     if user_hwid is None:
+#         raise HTTPException(status_code=311, detail="Autentication failed")
+#     else:
+#      	return True
+
+# def check_access_token(request: Request):
+#     access_token_cookie = request.cookies.get("access_token")
+#     if access_token_cookie is not None:
+#         current_user: model.TikTokTableUser = Depends(get_current_user)
+#         return True
+#     else:
+#         # raise HTTPException(status_code=401, detail="Cookies do not found")
+#         return False
+
+# # Ваш маршрут, использующий зависимость для проверки наличия куки access_token
+# @userRouter.get("/secure-endpoint")
+# async def secure_endpoint(username: str = Body(embed=True),cookie_present: bool = Depends(check_access_token), user: bool = Depends(check_user_bot_info)):
+	
+#     return {"message": "Доступ разрешен", "user": user}
  

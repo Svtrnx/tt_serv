@@ -59,6 +59,7 @@ class TikTokTableProxy(Base):
     proxy_username = Column(String)
     proxy_password = Column(String)
     used = Column(Boolean)
+    proxy_type = Column(String)
     
 class TikTokTableRegAccounts(Base):
     __tablename__ = 'reg_accounts'
@@ -117,12 +118,14 @@ class TikTokClusterRequestForm:
         proxy_address: str = Form(),
         proxy_port: str = Form(),
         proxy_username: str = Form(),
-        proxy_password: str = Form()
+        proxy_password: str = Form(),
+        proxy_type: str = Form()
     ):
         self.proxy_address = proxy_address
         self.proxy_port = proxy_port
         self.proxy_username = proxy_username
         self.proxy_password = proxy_password
+        self.proxy_type = proxy_type
 
 class TikTokRegUserRequestForm:
 	
@@ -183,6 +186,36 @@ class TikTokProxyUpdateForm:
         self.proxy_port = proxy_port
         self.proxy_password = proxy_password
         self.used = used
+            
+class TikTokAccountIsActiveUpdateForm:
+	
+    def __init__(
+        self,
+        username: str = Form(),
+        email: str = Form(),
+        password: str = Form(),
+        is_loginning_now: bool = Form(),
+        is_uploaded_content: bool = Form()
+        
+    ):
+        self.username = username
+        self.email = email
+        self.password = password
+        self.is_loginning_now = is_loginning_now
+        self.is_uploaded_content = is_uploaded_content
+        
+class TikTokMediaCompletedUpdateForm:
+	
+    def __init__(
+        self,
+        media_name: str = Form(),
+        unique_id: str = Form(),
+        completed: bool = Form(),
+        
+    ):
+        self.media_name = media_name
+        self.unique_id = unique_id
+        self.completed = completed
 
 
 

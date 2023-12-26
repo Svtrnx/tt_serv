@@ -27,7 +27,8 @@ def query_tiktok_media(username):
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    results = session.query(TikTokTableMedia).filter(TikTokTableMedia.username == username).all()
+    results = session.query(TikTokTableMedia).filter((TikTokTableMedia.username == username) &
+                                                    TikTokTableMedia.completed == False).all()
 
     session.close()
 
@@ -71,11 +72,25 @@ def update_is_active(session, cluster_id, new_is_active):
 def check_user(session, username, user_key):
     try:
         record = session.query(TikTokTableUser).filter(
-            (TikTokTableUser.username == username) & (TikTokTableUser.user_key == user_key)
-        ).first()
+            (TikTokTableUser.username == username) & (TikTokTableUser.user_key == user_key)).first()
 
         if record:
             return True
+        else:
+            return False
+
+    except Exception as e:
+        session.rollback()
+        return f"Error checking user: {e}"
+    
+def check_key(session, username, hwid):
+    try:
+        user_current_key = session.query(TikTokTableUser).filter(
+            (TikTokTableUser.username == username) & (TikTokTableUser.hwid == hwid)
+        ).first()
+
+        if user_current_key:
+            return user_current_key
         else:
             return False
 
