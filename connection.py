@@ -85,6 +85,9 @@ def check_user(session, username, user_key):
     
 def check_key(session, username, hwid):
     try:
+        print('session', session)
+        print('username', username)
+        print('hwid', hwid)
         user_current_key = session.query(TikTokTableUser).filter(
             (TikTokTableUser.username == username) & (TikTokTableUser.hwid == hwid)
         ).first()
