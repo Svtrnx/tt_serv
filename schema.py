@@ -15,6 +15,7 @@ class TikTokMediaSchema(BaseModel):
     username: Optional[str]=None
     unique_id: Optional[str]=None
     media_name: Optional[str]=None
+    tags: Optional[str]=None
     
     
 class TikTokSchemaRegAccount(BaseModel):

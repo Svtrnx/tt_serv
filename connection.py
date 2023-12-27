@@ -148,6 +148,7 @@ def create_media_task(db: Session, media: schema.TikTokMediaSchema):
         username                    = media.username,
         unique_id                   = media.unique_id,
         media_name                  = media.media_name,
+        tags                        = media.tags,
     )
     db.add(new_media)
     db.commit()
