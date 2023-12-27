@@ -101,6 +101,7 @@ async def create_task(db: Session = Depends(get_db), current_user: model.MediaRe
 			username=form_data.username,
 			unique_id=form_data.unique_id,
 			media_name=form_data.media_name,
+			tags=form_data.tags,
 		)
 		media = create_media_task(db=db, media=new_media)
 		return {'media': media}

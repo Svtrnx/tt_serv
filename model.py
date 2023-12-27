@@ -36,6 +36,7 @@ class TikTokTableMedia(Base):
     username = Column(String)
     unique_id = Column(String)
     media_name = Column(String)
+    tags = Column(String)
     
 class TikTokTableUser(Base):
     __tablename__ = 'users'
@@ -101,6 +102,7 @@ class MediaRequestForm:
         username: str = Form(),
         unique_id: str = Form(),
         media_name: str = Form(),
+        tags: str = Form(),
     ):
         self.content = content
         self.cluster_name_media = cluster_name_media
@@ -110,6 +112,7 @@ class MediaRequestForm:
         self.username = username
         self.unique_id = unique_id
         self.media_name = media_name
+        self.tags = tags
      
 class TikTokClusterRequestForm:
 	
