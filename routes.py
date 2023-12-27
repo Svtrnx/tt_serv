@@ -35,8 +35,8 @@ def check_auth(db: Session = Depends(get_db), current_user: model.TikTokClusterH
 		return {"clusters": clusters}
 	
 @userRouter.get('/get_tiktok_media')
-def check_auth(username: str, db: Session = Depends(get_db)):
-	user_media = query_tiktok_media(session=session, username=username)
+def check_auth(username: str, data_select: str, db: Session = Depends(get_db)):
+	user_media = query_tiktok_media(session=session, username=username, data_select=data_select)
 	return {"media": user_media}
 
 @userRouter.post('/update_active')

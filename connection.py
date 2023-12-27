@@ -23,12 +23,14 @@ def query_tiktok_table(current_user):
 
     return results
 
-def query_tiktok_media(session, username):
+def query_tiktok_media(session, username, data_select):
 
-    results = session.query(TikTokTableMedia).filter(
-        and_(TikTokTableMedia.username == username, TikTokTableMedia.completed == False)
-    ).all()
-
+    if data_select == 'workable':
+        results = session.query(TikTokTableMedia).filter(
+            and_(TikTokTableMedia.username == username, TikTokTableMedia.completed == False)
+        ).all()
+    elif data_select == 'all':
+        results = session.query(TikTokTableMedia).filter(TikTokTableMedia.username == username).all()
     
     session.close()
 
