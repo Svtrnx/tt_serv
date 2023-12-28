@@ -102,7 +102,7 @@ class MediaRequestForm:
         username: str = Form(),
         unique_id: str = Form(),
         media_name: str = Form(),
-        tags: str = Form(),
+        tags: str = Form(None),
     ):
         self.content = content
         self.cluster_name_media = cluster_name_media
