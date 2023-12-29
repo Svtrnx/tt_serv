@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter, Request, Body, Response, HTTPException, status, Form, Cookie
-from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, check_key
+from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, check_key, create_warming_link
 from schema import Token
 from sqlalchemy.orm import Session
 import model
@@ -88,8 +88,28 @@ async def create_task(
 	else:
 		return {"error": "Proxy address not provided or cluster_name does not match"}
 
+
+@userRouter.post('/create_warming_link')
+async def create_warming_link_func(
+		db: Session = Depends(get_db), 
+		current_user: model.TikTokTableWarming = Depends(get_current_user),
+		form_data: model.TikTokMediaWarmingForm = Depends(),
+):
+    if current_user.username == form_data.username:
+        new_warming = model.TikTokTableWarming(
+            link=form_data.link,
+            username=form_data.username,
+            unique_id=form_data.unique_id,
+        )
+        warming_response = create_warming_link(db=db, warming=new_warming)
+        return {'warming': warming_response}
+    else:
+        raise HTTPException(status_code=310, detail="Authentication failed")
+
 @userRouter.post('/create_task')
-async def create_task(tags: str = Body(None, embed=True), db: Session = Depends(get_db), current_user: model.MediaRequestForm = Depends(get_current_user), form_data: model.MediaRequestForm = Depends()):
+async def create_task(db: Session = Depends(get_db), 
+					  current_user: model.MediaRequestForm = Depends(get_current_user), 
+					  form_data: model.MediaRequestForm = Depends()):
 	if current_user.username == form_data.username:
 		new_media = model.TikTokTableMedia(
 			content=form_data.content,
@@ -101,7 +121,7 @@ async def create_task(tags: str = Body(None, embed=True), db: Session = Depends(
 			username=form_data.username,
 			unique_id=form_data.unique_id,
 			media_name=form_data.media_name,
-			# tags=form_data.tags
+			tags=form_data.tags,
 		)
 		media = create_media_task(db=db, media=new_media)
 		return {'media': media}

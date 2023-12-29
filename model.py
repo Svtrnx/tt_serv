@@ -78,6 +78,14 @@ class TikTokTableRegAccounts(Base):
     work_time = Column(DateTime)
     reg_time = Column(DateTime)
     user_reg = Column(String)
+    
+class TikTokTableWarming(Base):
+    __tablename__ = 'warming'
+
+    id = Column(Integer, primary_key=True)
+    link = Column(String)
+    username = Column(String)
+    unique_id = Column(String)
 
 
 class OAuth2PasswordRequestFormSignin:
@@ -219,6 +227,19 @@ class TikTokMediaCompletedUpdateForm:
         self.media_name = media_name
         self.unique_id = unique_id
         self.completed = completed
+
+class TikTokMediaWarmingForm:
+	
+    def __init__(
+        self,
+        link: str = Form(None),
+        username: str = Form(None),
+        unique_id: str = Form(None),
+        
+    ):
+        self.link = link
+        self.username = username
+        self.unique_id = unique_id
 
 
 

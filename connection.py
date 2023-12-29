@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
-from model import Base, TikTokTable, TikTokTableUser, TikTokTableMedia, TikTokTableRegAccounts
+from model import Base, TikTokTable, TikTokTableUser, TikTokTableMedia, TikTokTableRegAccounts, TikTokTableWarming
 from config import DB_NAME, DB_HOST, DB_PORT, DB_USER, DB_PASS
 import datetime
 from sqlalchemy.orm import Session
@@ -154,6 +154,17 @@ def create_media_task(db: Session, media: schema.TikTokMediaSchema):
     db.commit()
     db.refresh(new_media)
     return new_media
+
+def create_warming_link(db: Session, warming: schema.TikTokWarmingSchema):
+    new_warming = TikTokTableWarming(
+        link                        = warming.link,
+        username                    = warming.username,
+        unique_id                   = warming.unique_id,
+    )
+    db.add(new_warming)
+    db.commit()
+    db.refresh(new_warming)
+    return new_warming
 
 def create_user_reg(db: Session, user_reg: schema.TikTokSchemaRegAccount):
     new_user_reg = TikTokTableRegAccounts(

@@ -17,6 +17,13 @@ class TikTokMediaSchema(BaseModel):
     media_name: Optional[str]=None
     tags: Optional[str]=None
     
+
+class TikTokWarmingSchema(BaseModel):
+    id: int
+    link: Optional[str]=None
+    unique_id: Optional[str]=None
+    username: Optional[str]=None
+    
     
 class TikTokSchemaRegAccount(BaseModel):
     id: int
