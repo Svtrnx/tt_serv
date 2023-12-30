@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter, Request, Body, Response, HTTPException, status, Form, Cookie
-from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, check_key, create_warming_link
+from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, check_key, create_warming_link, query_tiktok_warming_links
 from schema import Token
 from sqlalchemy.orm import Session
 import model
@@ -363,6 +363,16 @@ def update_tt_media_to_completed(
 		else:
 			return {"error": "Media dont found"}
 	
+ 
+
+@userRouter.get('/get_warming_links')
+def check_auth(current_user_hwid: str, unique_id: str, username: str, db: Session = Depends(get_db)):
+	user_hwid = query_tiktok_table_check_auth(current_user_hwid)
+	if user_hwid is None:
+		raise HTTPException(status_code=311, detail="Autentication failed")
+	else:
+		warming_links = query_tiktok_warming_links(username=username, unique_id=unique_id)
+		return {"warming_links": warming_links}	
 
 # def check_user_bot_info(username: str = Body(embed=True, default=None), user_key: str = Body(embed=True, default=None), hwid: str = Body(embed=True, default=None)):
 #     user_hwid = query_tiktok_table_check_auth(hwid)

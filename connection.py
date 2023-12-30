@@ -23,6 +23,17 @@ def query_tiktok_table(current_user):
 
     return results
 
+def query_tiktok_warming_links(username, unique_id):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    results = session.query(TikTokTableWarming).filter((TikTokTableWarming.username == username)
+                            & (TikTokTableWarming.unique_id == unique_id)).all()
+
+    session.close()
+
+    return results
+
 def query_tiktok_media(session, username, data_select):
 
     if data_select == 'workable':
