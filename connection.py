@@ -34,6 +34,17 @@ def query_tiktok_warming_links(username, unique_id):
 
     return results
 
+def update_tiktok_warming_links(username, unique_id):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    results = session.query(TikTokTableWarming).filter((TikTokTableWarming.username == username)
+                            & (TikTokTableWarming.unique_id == unique_id)).all()
+
+    session.close()
+
+    return results
+
 def query_tiktok_media(session, username, data_select):
 
     if data_select == 'workable':
@@ -171,6 +182,7 @@ def create_warming_link(db: Session, warming: schema.TikTokWarmingSchema):
         link                        = warming.link,
         username                    = warming.username,
         unique_id                   = warming.unique_id,
+        completed                   = warming.completed,
     )
     db.add(new_warming)
     db.commit()

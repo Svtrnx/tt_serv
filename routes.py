@@ -100,6 +100,7 @@ async def create_warming_link_func(
             link=form_data.link,
             username=form_data.username,
             unique_id=form_data.unique_id,
+            completed=False,
         )
         warming_response = create_warming_link(db=db, warming=new_warming)
         return {'warming': warming_response}
@@ -158,6 +159,7 @@ async def create_task(
 		proxy_port: int = Body(embed=True),
 		proxy_username: str = Body(embed=True),
 		proxy_password: str = Body(embed=True),
+		proxy_type: str = Body(embed=True),
 		used: bool = Body(embed=True),
 		db: Session = Depends(get_db),
 		form_data: model.TikTokProxyUpdateForm = Depends()
@@ -167,12 +169,14 @@ async def create_task(
 	form_data.proxy_username 	= proxy_username
 	form_data.proxy_password 	= proxy_password
 	form_data.used 				= used
+	form_data.proxy_type 		= proxy_type
 	
 	db_proxy = db.query(model.TikTokTableProxy).filter_by(
 		proxy_address=form_data.proxy_address,
 		proxy_port=form_data.proxy_port,
 		proxy_username=form_data.proxy_username,
-		proxy_password=form_data.proxy_password
+		proxy_password=form_data.proxy_password,
+		proxy_type=form_data.proxy_type
 	).first()
 
 	if db_proxy:
@@ -366,13 +370,43 @@ def update_tt_media_to_completed(
  
 
 @userRouter.get('/get_warming_links')
-def check_auth(current_user_hwid: str, unique_id: str, username: str, db: Session = Depends(get_db)):
+def get_warming_links_function(current_user_hwid: str, unique_id: str, username: str, db: Session = Depends(get_db)):
 	user_hwid = query_tiktok_table_check_auth(current_user_hwid)
 	if user_hwid is None:
 		raise HTTPException(status_code=311, detail="Autentication failed")
 	else:
 		warming_links = query_tiktok_warming_links(username=username, unique_id=unique_id)
 		return {"warming_links": warming_links}	
+
+@userRouter.patch('/update_warming_links')
+def update_warming_links_function(current_user_hwid: str = Body(embed=True), unique_id: str = Body(embed=True), username: str = Body(embed=True), completed: bool = Body(embed=True), db: Session = Depends(get_db)):
+    user_hwid = query_tiktok_table_check_auth(current_user_hwid)
+    if user_hwid is None:
+        raise HTTPException(status_code=311, detail="Autentication failed")
+    else:
+        # Используйте filter вместо filter_by
+        db_accounts = db.query(model.TikTokTableWarming).filter(
+            model.TikTokTableWarming.username == username,
+            model.TikTokTableWarming.unique_id == unique_id,
+        ).all()
+
+        if db_accounts:
+            # Обновление всех записей
+            response = db.query(model.TikTokTableWarming).filter(
+                model.TikTokTableWarming.username == username,
+                model.TikTokTableWarming.unique_id == unique_id,
+            ).update({model.TikTokTableWarming.completed: completed}, synchronize_session=False)
+
+            # Подтверждение изменений в базе данных
+            db.commit()
+
+            # Возвращаем обновленные записи
+            return {"warming_links_updated": response}
+
+        else:
+            return {"error": "warming link dont found"}
+			
+		# return {"warming_links": warming_links}	
 
 # def check_user_bot_info(username: str = Body(embed=True, default=None), user_key: str = Body(embed=True, default=None), hwid: str = Body(embed=True, default=None)):
 #     user_hwid = query_tiktok_table_check_auth(hwid)

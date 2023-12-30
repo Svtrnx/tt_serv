@@ -86,6 +86,7 @@ class TikTokTableWarming(Base):
     link = Column(String)
     username = Column(String)
     unique_id = Column(String)
+    completed = Column(Boolean)
 
 
 class OAuth2PasswordRequestFormSignin:
@@ -190,13 +191,15 @@ class TikTokProxyUpdateForm:
         proxy_address: str = Form(),
         proxy_port: int = Form(),
         proxy_password: str = Form(),
-        used: bool = Form()
+        used: bool = Form(),
+        proxy_type: str = Form()
         
     ):
         self.proxy_address = proxy_address
         self.proxy_port = proxy_port
         self.proxy_password = proxy_password
         self.used = used
+        self.proxy_type = proxy_type
             
 class TikTokAccountIsActiveUpdateForm:
 	
