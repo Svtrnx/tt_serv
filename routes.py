@@ -163,6 +163,8 @@ async def update_reg_account_func(
 		proxy_port: int = Body(embed=True),
 		proxy_username: str = Body(embed=True),
 		proxy_password: str = Body(embed=True),
+		work_time: datetime = Body(embed=True),
+		is_warmed: bool = Body(embed=True),
 		db: Session = Depends(get_db),
 		form_data: model.TikTokRegAccountUpdateForm = Depends()
 ):
@@ -187,6 +189,8 @@ async def update_reg_account_func(
 		db_account.proxy_port = form_data.proxy_port
 		db_account.proxy_username = form_data.proxy_username
 		db_account.proxy_password = form_data.proxy_password
+		db_account.work_time = work_time
+		db_account.is_warmed = is_warmed
 		db.commit()
 		db.refresh(db_account)
 		return {"reg_account": db_account}
