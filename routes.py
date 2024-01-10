@@ -144,9 +144,10 @@ async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokReg
 		proxy_port=form_data.proxy_port,
 		proxy_username=form_data.proxy_username,
 		proxy_password=form_data.proxy_password,
-		work_time=new_time,
+		work_time=datetime.now() + timedelta(hours=2),
 		reg_time=datetime.now() + timedelta(hours=2),
-		user_reg=form_data.user_reg
+		user_reg=form_data.user_reg,
+		is_warmed=False
 	)
 	user_reg = create_user_reg(db=db, user_reg=new_user_reg)
 	return {'user_reg': user_reg}
@@ -226,7 +227,8 @@ async def check_auth(db: Session = Depends(get_db),
 				"proxy_password": account.proxy_password,
 				"work_time": account.work_time,
 				"reg_time": account.reg_time,
-				"user_reg": account.user_reg
+				"user_reg": account.user_reg,
+				"is_warmed": account.is_warmed
 			}
 			for account in reg_accounts
 		]
@@ -263,7 +265,8 @@ async def check_auth(db: Session = Depends(get_db), current_user: model.TikTokCl
 						"proxy_password": account.proxy_password,
 						"work_time": account.work_time,
 						"reg_time": account.reg_time,
-						"user_reg": account.user_reg
+						"user_reg": account.user_reg,
+						"is_warmed": account.is_warmed,
 					}
 					for account in reg_accounts
 				]

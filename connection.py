@@ -203,6 +203,7 @@ def create_user_reg(db: Session, user_reg: schema.TikTokSchemaRegAccount):
         work_time                   = user_reg.work_time,
         reg_time                    = user_reg.reg_time,
         user_reg                    = user_reg.user_reg,
+        is_warmed                   = user_reg.is_warmed,
     )
     db.add(new_user_reg)
     db.commit()

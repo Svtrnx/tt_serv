@@ -21,6 +21,7 @@ class TikTokTable(Base):
     proxy_username = Column(String)
     proxy_password = Column(String)
     user_id = Column(String)
+    is_reg = Column(Boolean)
     
 class TikTokTableMedia(Base):
     __tablename__ = 'tt_media'
@@ -78,6 +79,7 @@ class TikTokTableRegAccounts(Base):
     work_time = Column(DateTime)
     reg_time = Column(DateTime)
     user_reg = Column(String)
+    is_warmed = Column(Boolean)
     
 class TikTokTableWarming(Base):
     __tablename__ = 'warming'
@@ -152,7 +154,7 @@ class TikTokRegUserRequestForm:
         proxy_port: int = Form(),
         proxy_username: str = Form(),
         proxy_password: str = Form(),
-        user_reg: str = Form()
+        user_reg: str = Form(),
     ):
         self.username = username
         self.email = email
