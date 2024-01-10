@@ -202,6 +202,26 @@ class TikTokProxyUpdateForm:
         self.proxy_password = proxy_password
         self.used = used
         self.proxy_type = proxy_type
+ 
+
+class TikTokRegAccountUpdateForm:
+	
+    def __init__(
+        self,
+        username: str = Form(),
+        email: str = Form(),
+        password: str = Form(),
+        user_reg: str = Form(),
+        proxy_address: str = Form(),
+        proxy_port: int = Form(),
+        proxy_username: str = Form(),
+        proxy_password: str = Form(),
+        
+    ):
+        self.proxy_address = proxy_address
+        self.proxy_port = proxy_port
+        self.proxy_username = proxy_username
+        self.proxy_password = proxy_password 
             
 class TikTokAccountIsActiveUpdateForm:
 	

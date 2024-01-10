@@ -152,6 +152,46 @@ async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokReg
 	user_reg = create_user_reg(db=db, user_reg=new_user_reg)
 	return {'user_reg': user_reg}
 	
+
+@userRouter.patch('/update_reg_account')
+async def update_reg_account_func(
+		username: str = Body(embed=True),
+		email: str = Body(embed=True),
+		password: str = Body(embed=True),
+		user_reg: str = Body(embed=True),
+		proxy_address: str = Body(embed=True),
+		proxy_port: int = Body(embed=True),
+		proxy_username: str = Body(embed=True),
+		proxy_password: str = Body(embed=True),
+		db: Session = Depends(get_db),
+		form_data: model.TikTokRegAccountUpdateForm = Depends()
+):
+	form_data.username 			= username
+	form_data.email 			= email
+	form_data.password 			= password
+	form_data.user_reg 			= user_reg
+	form_data.proxy_address 	= proxy_address
+	form_data.proxy_port 		= proxy_port
+	form_data.proxy_username 	= proxy_username
+	form_data.proxy_password 	= proxy_password
+	
+	db_account = db.query(model.TikTokTableRegAccounts).filter_by(
+		username=form_data.username,
+		email=form_data.email,
+		password=form_data.password,
+		user_reg=form_data.user_reg,
+	).first()
+
+	if db_account:
+		db_account.proxy_address = form_data.proxy_address
+		db_account.proxy_port = form_data.proxy_port
+		db_account.proxy_username = form_data.proxy_username
+		db_account.proxy_password = form_data.proxy_password
+		db.commit()
+		db.refresh(db_account)
+		return {"reg_account": db_account}
+	else:
+		return {"error": "Account dont found"}
  
 
 @userRouter.patch('/update_used_proxy')
