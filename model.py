@@ -22,6 +22,7 @@ class TikTokTable(Base):
     proxy_password = Column(String)
     user_id = Column(String)
     is_reg = Column(Boolean)
+    is_freezed = Column(Boolean)
     
 class TikTokTableMedia(Base):
     __tablename__ = 'tt_media'
