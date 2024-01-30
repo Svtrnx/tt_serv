@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from fastapi import Form
 
@@ -147,7 +147,7 @@ class TikTokRegUserRequestForm:
     def __init__(
         self,
         username: str = Form(),
-        email: str = Form(),
+        email: str = Form(default=None),
         password: str = Form(),
         is_loginning_now: bool = Form(),
         is_uploaded_content: bool = Form(),
@@ -258,7 +258,7 @@ class TikTokMediaWarmingForm:
 	
     def __init__(
         self,
-        link: str = Form(None),
+        link: str = Form(default=None),
         username: str = Form(None),
         unique_id: str = Form(None),
         
