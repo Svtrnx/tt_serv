@@ -156,7 +156,7 @@ async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokReg
 @userRouter.patch('/update_reg_account')
 async def update_reg_account_func(
 		username: str = Body(embed=True),
-		email: str = Body(embed=True),
+		email: str = Body(embed=True, default=None),
 		password: str = Body(embed=True),
 		user_reg: str = Body(embed=True),
 		proxy_address: str = Body(embed=True),
@@ -381,7 +381,7 @@ def update_is_loginning_now(
 @userRouter.patch('/update_account_upload_content')
 def update_is_uploaded_content(
 	username: str = Body(embed=True), 
-	email: str = Body(embed=True), 
+	email: str = Body(embed=True, default=None), 
 	password: str = Body(embed=True), 
 	is_uploaded_content: bool = Body(embed=True), 
 	db: Session = Depends(get_db), 
