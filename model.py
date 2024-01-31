@@ -210,7 +210,7 @@ class TikTokRegAccountUpdateForm:
     def __init__(
         self,
         username: str = Form(),
-        email: str = Form(),
+        email: str = Form(default=None),
         password: str = Form(),
         user_reg: str = Form(),
         proxy_address: str = Form(),
@@ -229,7 +229,7 @@ class TikTokAccountIsActiveUpdateForm:
     def __init__(
         self,
         username: str = Form(),
-        email: str = Form(),
+        email: str = Form(default=None),
         password: str = Form(),
         is_loginning_now: bool = Form(),
         is_uploaded_content: bool = Form()
