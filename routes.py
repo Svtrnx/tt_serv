@@ -349,7 +349,7 @@ async def check_auth(db: Session = Depends(get_db), current_user: model.TikTokCl
 @userRouter.patch('/update_account_activity_login')
 def update_is_loginning_now(
 	username: str = Body(embed=True), 
-	email: str = Body(embed=True), 
+	email: str = Body(embed=True, default=None), 
 	password: str = Body(embed=True), 
 	is_loginning_now: bool = Body(embed=True), 
 	db: Session = Depends(get_db), 
