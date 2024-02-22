@@ -189,6 +189,18 @@ def create_warming_link(db: Session, warming: schema.TikTokWarmingSchema):
     db.refresh(new_warming)
     return new_warming
 
+def delete_media(db: Session, unique_id):
+    try:
+        db.query(TikTokTableMedia).filter(TikTokTableMedia.unique_id == unique_id).delete()
+
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        return f"Error deleting media: {e}"
+
+
+
 def create_user_reg(db: Session, user_reg: schema.TikTokSchemaRegAccount):
     new_user_reg = TikTokTableRegAccounts(
         username                    = user_reg.username,

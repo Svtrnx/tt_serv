@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter, Request, Body, Response, HTTPException, status, Form, Cookie
-from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, check_key, create_warming_link, query_tiktok_warming_links
+from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, delete_media, check_key, create_warming_link, query_tiktok_warming_links
 from schema import Token
 from sqlalchemy.orm import Session
 import model
@@ -277,6 +277,17 @@ async def check_auth(proxy_type: str, db: Session = Depends(get_db)):
 	else:
 		return {"message": "Proxy not found!"}
 	
+@userRouter.delete("/delete_media")
+async def delete_media_func(unique_id: str = Body(embed=True), db: Session = Depends(get_db)):
+	try:
+		delete_media(db=db, unique_id=unique_id)
+  
+		return {'status': 'successfully deleted'}
+	except Exception as e:
+		print("Error deleting media")
+		return "Error deleting media"
+     
+ 
  
 @userRouter.get("/get_reg_accounts")
 async def check_auth(db: Session = Depends(get_db), 
