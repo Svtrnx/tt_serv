@@ -1,10 +1,11 @@
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
-from model import Base, TikTokTable, TikTokTableUser, TikTokTableMedia, TikTokTableRegAccounts, TikTokTableWarming
+from model import Base, TikTokTable, TikTokTableUser, TikTokTableMedia, TikTokTableRegAccounts, TikTokTableWarming, TikTokTableProxy
 from config import DB_NAME, DB_HOST, DB_PORT, DB_USER, DB_PASS
 import datetime
 from sqlalchemy.orm import Session
 import schema
+from typing import List
 
 db_url = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 engine = create_engine(db_url)
@@ -34,6 +35,17 @@ def query_tiktok_warming_links(username, unique_id):
 
     return results
 
+def get_proxy_list():
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    results = session.query(TikTokTableProxy).filter((TikTokTableProxy.proxy_type == 'bad')
+                            & (TikTokTableProxy.used == False)).count()
+
+    session.close()
+
+    return results
+
 def update_tiktok_warming_links(username, unique_id):
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -57,6 +69,22 @@ def query_tiktok_media(session, username, data_select):
     session.close()
 
     return results
+
+
+def create_proxy_list(db: Session, media: List[schema.TikTokProxySchema]):
+	new_proxies = [
+		TikTokTableProxy(
+			proxy_address=proxy.proxy_address,
+			proxy_port=proxy.proxy_port,
+			proxy_username=proxy.proxy_username,
+			proxy_password=proxy.proxy_password,
+			used=proxy.used,
+			proxy_type=proxy.proxy_type,
+		)
+		for proxy in media
+	]
+	db.add_all(new_proxies)
+	db.commit()
 
 
 def query_tiktok_table_check_auth(hwid):

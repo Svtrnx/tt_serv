@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter, Request, Body, Response, HTTPException, status, Form, Cookie
-from connection import session, query_tiktok_table, update_is_active, check_user, get_db, create_media_task, get_cluster, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, delete_media, check_key, create_warming_link, query_tiktok_warming_links
+from connection import session, query_tiktok_table, update_is_active, check_user, get_db, get_proxy_list, create_media_task, get_cluster, create_proxy_list, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, delete_media, check_key, create_warming_link, query_tiktok_warming_links
 from schema import Token
 from sqlalchemy.orm import Session
 import model
@@ -9,6 +9,7 @@ from authSecurity import create_access_token, get_current_user
 from starlette.responses import RedirectResponse
 from dotenv import load_dotenv
 from config import ACCESS_TOKEN_EXPIRE_MINUTES, COOKIE_NAME
+from typing import List
 
 load_dotenv()
 userRouter = APIRouter()
@@ -278,7 +279,7 @@ async def check_auth(proxy_type: str, db: Session = Depends(get_db)):
 		return {"message": "Proxy not found!"}
 	
 @userRouter.delete("/delete_media")
-async def delete_media_func(unique_id: str = Body(embed=True), db: Session = Depends(get_db)):
+async def delete_media_func(unique_id: str = Body(embed=True), db: Session = Depends(get_db), current_user: model.TikTokTableUser = Depends(get_current_user)):
 	try:
 		delete_media(db=db, unique_id=unique_id)
   
@@ -493,6 +494,34 @@ def update_warming_links_function(current_user_hwid: str = Body(embed=True), uni
 			return {"error": "warming link dont found"}
 			
 		# return {"warming_links": warming_links}	
+
+
+@userRouter.post('/create-proxy')
+def create_proxy_func(prxy_list: List[str] = Body(...), db: Session = Depends(get_db), current_user: model.TikTokTableUser = Depends(get_current_user)):
+    try:
+        new_proxies = [
+            model.TikTokTableProxy(
+                proxy_address=proxy.split(':')[0],
+                proxy_port=proxy.split(':')[1],
+                proxy_username=proxy.split(':')[2],
+                proxy_password=proxy.split(':')[3],
+                used=False,
+                proxy_type='bad',
+            )
+            for proxy in prxy_list
+        ]
+        create_proxy_list(db=db, media=new_proxies)
+        return {'status': 'success'}
+    except Exception as e:
+        raise HTTPException(status_code=511, detail=f"Error: {e}")
+
+
+@userRouter.get('/get_proxy_list')
+def get_proxy_list_func(current_user: model.TikTokTableUser = Depends(get_current_user)):
+	proxy = get_proxy_list()
+	return proxy
+# current_user: model.TikTokTableUser = Depends(get_current_user)
+
 
 # def check_user_bot_info(username: str = Body(embed=True, default=None), user_key: str = Body(embed=True, default=None), hwid: str = Body(embed=True, default=None)):
 #     user_hwid = query_tiktok_table_check_auth(hwid)

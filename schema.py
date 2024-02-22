@@ -17,6 +17,14 @@ class TikTokMediaSchema(BaseModel):
     media_name: Optional[str]=None
     tags: Optional[str]=None
     
+class TikTokProxySchema(BaseModel):
+    id: int
+    proxy_address: Optional[str]=None
+    proxy_port: Optional[int]=None
+    proxy_username: Optional[str]=None
+    proxy_password: Optional[bool]=None
+    used: Optional[bool]=None
+    proxy_type: Optional[str]=None  
 
 class TikTokWarmingSchema(BaseModel):
     id: int
