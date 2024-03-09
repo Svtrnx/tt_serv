@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter, Request, Body, Response, HTTPException, status, Form, Cookie
-from connection import session, query_tiktok_table, update_is_active, check_user, get_db, get_proxy_list, create_media_task, get_cluster, create_proxy_list, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, delete_media, check_key, create_warming_link, query_tiktok_warming_links
+from connection import session, query_tiktok_table, update_is_active, get_docs_list_bot, create_doc, delete_doc, get_docs_list, check_user, get_db, get_proxy_list, create_media_task, get_cluster, create_proxy_list, query_tiktok_table_check_auth, query_tiktok_media, create_user_reg, delete_media, check_key, create_warming_link, query_tiktok_warming_links
 from schema import Token
 from sqlalchemy.orm import Session
 import model
@@ -523,6 +523,52 @@ def get_proxy_list_func(current_user: model.TikTokTableUser = Depends(get_curren
 # current_user: model.TikTokTableUser = Depends(get_current_user)
 
 
+@userRouter.post('/create_doc')
+async def create_doc_func(db: Session = Depends(get_db), form_data: model.TikTokCreateDocRequestForm = Depends(), current_user: model.TikTokTableUser = Depends(get_current_user)):
+	# current_time = datetime.now() + timedelta(hours=2)
+	# new_time = current_time + timedelta(hours=12)
+	# print(new_time)
+	new_doc = model.TikTokCreateDocRequestForm(
+		business_name=form_data.business_name,
+		country=form_data.country,
+		address=form_data.address,
+		province=form_data.province,
+		city=form_data.city,
+		zip_code=form_data.zip_code,
+		license=form_data.license,
+		doc_img_1=form_data.doc_img_1,
+		doc_img_2=form_data.doc_img_2,
+		cluster=form_data.cluster,
+		username=current_user.username
+	)
+	doc = create_doc(db=db, doc=new_doc)
+	return {'doc': doc}
+
+
+@userRouter.get('/get_docs_list')
+def get_docs_list_func(current_user: model.TikTokTableUser = Depends(get_current_user)):
+	docs = get_docs_list(user = current_user.username)
+	return docs
+
+@userRouter.post('/get_docs_list_bot')
+def check_auth(cluster: str = Body(embed=True), current_user: model.TikTokClusterHwidCheckRequestForm = Depends()):
+	user_hwid = query_tiktok_table_check_auth(current_user.hwid)
+	if user_hwid is None:
+		raise HTTPException(status_code=311, detail="Autentication failed")
+	else:
+		docs = get_docs_list_bot(user=user_hwid.username, cluster=cluster)
+		return docs
+
+@userRouter.delete("/delete_doc")
+async def delete_doc_func(doc_id: str = Body(embed=True), db: Session = Depends(get_db), current_user: model.TikTokTableUser = Depends(get_current_user)):
+	try:
+		delete_doc(db=db, doc_id=doc_id, user=current_user.username)
+  
+		return {'status': 'successfully deleted'}
+	except Exception as e:
+		print("Error deleting media")
+		return f"Error deleting media: {e}"
+
 # def check_user_bot_info(username: str = Body(embed=True, default=None), user_key: str = Body(embed=True, default=None), hwid: str = Body(embed=True, default=None)):
 #     user_hwid = query_tiktok_table_check_auth(hwid)
 #     if user_hwid is None:
@@ -539,7 +585,6 @@ def get_proxy_list_func(current_user: model.TikTokTableUser = Depends(get_curren
 #         # raise HTTPException(status_code=401, detail="Cookies do not found")
 #         return False
 
-# # Ваш маршрут, использующий зависимость для проверки наличия куки access_token
 # @userRouter.get("/secure-endpoint")
 # async def secure_endpoint(username: str = Body(embed=True),cookie_present: bool = Depends(check_access_token), user: bool = Depends(check_user_bot_info)):
 	

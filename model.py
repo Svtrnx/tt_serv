@@ -63,7 +63,23 @@ class TikTokTableProxy(Base):
     proxy_password = Column(String)
     used = Column(Boolean)
     proxy_type = Column(String)
-    
+
+class TikTokTableDoc(Base):
+    __tablename__ = 'docs'
+
+    id = Column(Integer, primary_key=True)
+    business_name = Column(String)
+    country  = Column(String)
+    address  = Column(String)
+    province  = Column(String)
+    city = Column(String)
+    zip_code = Column(String)
+    license = Column(String)
+    doc_img_1 = Column(String)
+    doc_img_2 = Column(String)
+    cluster = Column(String)
+    username = Column(String)
+
 class TikTokTableRegAccounts(Base):
     __tablename__ = 'reg_accounts'
 
@@ -167,7 +183,36 @@ class TikTokRegUserRequestForm:
         self.proxy_username = proxy_username
         self.proxy_password = proxy_password,
         self.user_reg = user_reg
-        
+
+
+class TikTokCreateDocRequestForm:
+	
+    def __init__(
+        self,
+        business_name: str = Form(),
+        country: str = Form(),
+        address: str = Form(),
+        province: str = Form(),
+        city: str = Form(),
+        zip_code: str = Form(),
+        license: str = Form(),
+        doc_img_1: str = Form(),
+        doc_img_2: str = Form(),
+        cluster: str = Form(),
+        username: str = Form(default=None),
+    ):
+        self.business_name = business_name
+        self.country = country
+        self.address = address
+        self.province = province
+        self.city = city
+        self.zip_code = zip_code
+        self.license = license
+        self.doc_img_1 = doc_img_1
+        self.doc_img_2 = doc_img_2
+        self.cluster = cluster
+        self.username = username,
+
 class TikTokClusterHwidCheckRequestForm:
 	
     def __init__(

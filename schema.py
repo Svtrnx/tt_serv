@@ -25,6 +25,21 @@ class TikTokProxySchema(BaseModel):
     proxy_password: Optional[bool]=None
     used: Optional[bool]=None
     proxy_type: Optional[str]=None  
+    
+class TikTokDocSchema(BaseModel):
+    id: int
+    business_name: Optional[str]=None
+    country: Optional[str]=None
+    address: Optional[str]=None
+    province: Optional[str]=None
+    city: Optional[str]=None
+    zip_code: Optional[str]=None
+    license: Optional[str]=None
+    doc_img_1: Optional[str]=None
+    doc_img_2: Optional[str]=None
+    cluster: Optional[str]=None
+    username: Optional[str]=None
+    
 
 class TikTokWarmingSchema(BaseModel):
     id: int

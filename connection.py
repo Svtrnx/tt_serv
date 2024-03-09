@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
-from model import Base, TikTokTable, TikTokTableUser, TikTokTableMedia, TikTokTableRegAccounts, TikTokTableWarming, TikTokTableProxy
+from model import Base, TikTokTable, TikTokTableUser, TikTokTableMedia, TikTokTableDoc, TikTokTableRegAccounts, TikTokTableWarming, TikTokTableProxy
 from config import DB_NAME, DB_HOST, DB_PORT, DB_USER, DB_PASS
 import datetime
 from sqlalchemy.orm import Session
@@ -41,6 +41,27 @@ def get_proxy_list():
 
     results = session.query(TikTokTableProxy).filter((TikTokTableProxy.proxy_type == 'bad')
                             & (TikTokTableProxy.used == False)).count()
+
+    session.close()
+
+    return results
+
+def get_docs_list(user):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    results = session.query(TikTokTableDoc).filter(TikTokTableDoc.username == user).all()
+
+    session.close()
+
+    return results
+
+def get_docs_list_bot(user, cluster):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    results = session.query(TikTokTableDoc).filter((TikTokTableDoc.username == user)
+                            & (TikTokTableDoc.cluster == cluster)).all()
 
     session.close()
 
@@ -227,6 +248,15 @@ def delete_media(db: Session, unique_id):
         db.rollback()
         return f"Error deleting media: {e}"
 
+def delete_doc(db: Session, doc_id, user):
+    try:
+        db.query(TikTokTableDoc).filter((TikTokTableDoc.id == doc_id) & (TikTokTableDoc.username == user)).delete()
+
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        return f"Error deleting media: {e}"
 
 
 def create_user_reg(db: Session, user_reg: schema.TikTokSchemaRegAccount):
@@ -249,6 +279,25 @@ def create_user_reg(db: Session, user_reg: schema.TikTokSchemaRegAccount):
     db.commit()
     db.refresh(new_user_reg)
     return new_user_reg
+
+def create_doc(db: Session, doc: schema.TikTokDocSchema):
+    new_doc = TikTokTableDoc(
+        business_name                = doc.business_name,
+        country                      = doc.country,
+        address                      = doc.address,
+        province                     = doc.province,
+        city                         = doc.city,
+        zip_code                     = doc.zip_code,
+        license                      = doc.license,
+        doc_img_1                    = doc.doc_img_1,
+        doc_img_2                    = doc.doc_img_2,
+        cluster                      = doc.cluster,
+        username                     = doc.username,
+    )
+    db.add(new_doc)
+    db.commit()
+    db.refresh(new_doc)
+    return new_doc
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
