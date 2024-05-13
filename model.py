@@ -23,6 +23,7 @@ class TikTokTable(Base):
     user_id = Column(String)
     is_reg = Column(Boolean)
     is_freezed = Column(Boolean)
+    warns = Column(Integer)
     
 class TikTokTableMedia(Base):
     __tablename__ = 'tt_media'
