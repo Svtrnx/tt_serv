@@ -10,7 +10,7 @@ from starlette.responses import RedirectResponse
 from dotenv import load_dotenv
 from config import ACCESS_TOKEN_EXPIRE_MINUTES, COOKIE_NAME
 from typing import List
-from sqlalchemy import func
+from sqlalchemy import func, desc
 
 load_dotenv()
 userRouter = APIRouter()
@@ -295,10 +295,12 @@ async def delete_media_func(unique_id: str = Body(embed=True), db: Session = Dep
 async def check_auth(db: Session = Depends(get_db), 
                      current_user: model.TikTokTableUser = Depends(get_current_user)):
     
-    reg_accounts = db.query(model.TikTokTableRegAccounts).all()[-100:]
+    reg_accounts = db.query(model.TikTokTableRegAccounts)\
+                      .order_by(desc(model.TikTokTableRegAccounts.reg_time))\
+                      .limit(100)\
+                      .all()
     
     if reg_accounts:
-       
         reg_accounts_data = [
             {
                 "username": account.username,
