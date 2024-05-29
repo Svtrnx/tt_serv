@@ -133,7 +133,7 @@ async def create_task(db: Session = Depends(get_db),
 
 @userRouter.post('/create_reg_account')
 async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokRegUserRequestForm = Depends()):
-    current_time = datetime.now() + timedelta(hours=2)
+    current_time = datetime.now() + timedelta(hours=1)
     new_time = current_time + timedelta(hours=12)
     print(new_time)
     new_user_reg = model.TikTokTableRegAccounts(
@@ -147,7 +147,7 @@ async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokReg
         proxy_username=form_data.proxy_username,
         proxy_password=form_data.proxy_password,
         work_time=datetime.now() + timedelta(hours=5),
-        reg_time=datetime.now() + timedelta(hours=2),
+        reg_time=datetime.now() + timedelta(hours=1),
         user_reg=form_data.user_reg,
         is_warmed=False
     )
@@ -367,11 +367,15 @@ def update_is_loginning_now(
     email: str = Body(embed=True, default=None), 
     password: str = Body(embed=True), 
     is_loginning_now: bool = Body(embed=True), 
+    type_query: str = Body(embed=True, default=None), 
     db: Session = Depends(get_db), 
     current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), 
-     form_data: model.TikTokAccountIsActiveUpdateForm = Depends()
-      ):
-    user_hwid = query_tiktok_table_check_auth(current_user.hwid)
+    form_data: model.TikTokAccountIsActiveUpdateForm = Depends()
+    ):
+    if type_query == 'menu':
+        user_hwid = 'hwid'
+    else:    
+        user_hwid = query_tiktok_table_check_auth(current_user.hwid)
     if user_hwid is None:
         raise HTTPException(status_code=311, detail="Autentication failed")
     else:
@@ -397,13 +401,17 @@ def update_is_loginning_now(
 def update_is_uploaded_content(
     username: str = Body(embed=True), 
     email: str = Body(embed=True, default=None), 
+    type_query: str = Body(embed=True, default=None), 
     password: str = Body(embed=True), 
     is_uploaded_content: bool = Body(embed=True), 
     db: Session = Depends(get_db), 
     current_user: model.TikTokClusterHwidCheckRequestForm = Depends(), 
      form_data: model.TikTokAccountIsActiveUpdateForm = Depends()
       ):
-    user_hwid = query_tiktok_table_check_auth(current_user.hwid)
+    if type_query == 'menu':
+        user_hwid = 'hwid'
+    else:    
+        user_hwid = query_tiktok_table_check_auth(current_user.hwid)
     if user_hwid is None:
         raise HTTPException(status_code=311, detail="Autentication failed")
     else:

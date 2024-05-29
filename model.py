@@ -218,7 +218,7 @@ class TikTokClusterHwidCheckRequestForm:
 	
     def __init__(
         self,
-        hwid: str = Form()
+        hwid: str = Form(default=None)
     ):
         self.hwid = hwid
 
@@ -276,6 +276,7 @@ class TikTokAccountIsActiveUpdateForm:
         self,
         username: str = Form(),
         email: str = Form(default=None),
+        type_query: str = Form(default=None),
         password: str = Form(),
         is_loginning_now: bool = Form(),
         is_uploaded_content: bool = Form()
@@ -283,6 +284,7 @@ class TikTokAccountIsActiveUpdateForm:
     ):
         self.username = username
         self.email = email
+        self.type_query = type_query
         self.password = password
         self.is_loginning_now = is_loginning_now
         self.is_uploaded_content = is_uploaded_content
