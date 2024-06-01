@@ -133,7 +133,7 @@ async def create_task(db: Session = Depends(get_db),
 
 @userRouter.post('/create_reg_account')
 async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokRegUserRequestForm = Depends()):
-    current_time = datetime.now() + timedelta(hours=1)
+    current_time = datetime.now() + timedelta(hours=3)
     new_time = current_time + timedelta(hours=12)
     print(new_time)
     new_user_reg = model.TikTokTableRegAccounts(
@@ -147,7 +147,7 @@ async def create_task2(db: Session = Depends(get_db), form_data: model.TikTokReg
         proxy_username=form_data.proxy_username,
         proxy_password=form_data.proxy_password,
         work_time=datetime.now() + timedelta(hours=5),
-        reg_time=datetime.now() + timedelta(hours=1),
+        reg_time=datetime.now() + timedelta(hours=3),
         user_reg=form_data.user_reg,
         is_warmed=False
     )
